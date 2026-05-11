@@ -107,34 +107,18 @@ td,th{
 </head>
 <body>
 
-<div id="homeScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom,#061d1d,#0d5c3a);display:flex;justify-content:center;align-items:center;z-index:9999;flex-direction:column;">
-    <h1 style="font-size:50px;color:white;margin-bottom:30px;">麻雀成績管理</h1>
-    <button onclick="startApp()" style="padding:20px 50px;font-size:24px;border:none;border-radius:20px;background:gold;color:black;font-weight:bold;cursor:pointer;">
-        START
-    </button>
-</div>
-
 <header>
 麻雀成績管理
 </header>
 
 <div class="nav">
-    <button onclick="showPage('home')">ホーム</button>
     <button onclick="showPage('match')">対局入力</button>
     <button onclick="showPage('settlement')">精算</button>
     <button onclick="showPage('players')">プレイヤー</button>
     <button onclick="showPage('settings')">設定</button>
 </div>
 
-<div id="home" class="page active">
-    <div class="box">
-        <h2>ホーム</h2>
-        <p>麻雀成績管理アプリ</p>
-        <p>現在登録人数: <span id="playerCount">0</span>人</p>
-    </div>
-</div>
-
-<div id="match" class="page">
+<div id="match" class="page active">
     <div class="box">
         <h2>対局入力</h2>
 
@@ -143,7 +127,7 @@ td,th{
             <option value="3">3麻</option>
         </select>
 
-        <input id="rate" type="number" placeholder="レート">
+        <input id="rate" type="number" placeholder="レート" value="500">
 
         <div id="inputs"></div>
 
@@ -162,13 +146,18 @@ td,th{
 </div>
 
 <div id="players" class="page">
+
     <div class="box">
         <h2>アカウント作成</h2>
 
         <input id="newPlayer" placeholder="プレイヤー名">
 
-        <button class="main" onclick="addPlayer()">
-            プレイヤー追加
+        <input id="newIcon"
+        placeholder="アイコンURL">
+
+        <button class="main"
+        onclick="addPlayer()">
+        プレイヤー追加
         </button>
     </div>
 
@@ -208,36 +197,63 @@ let players = JSON.parse(localStorage.getItem('players')) || {};
 let matches = JSON.parse(localStorage.getItem('matches')) || [];
 
 function renderInputs(){
+
     const area = document.getElementById('inputs');
+
     area.innerHTML = '';
 
     const mode = Number(document.getElementById('mode').value);
 
     for(let i=1;i<=mode;i++){
-        area.innerHTML += `
-            <select id="name${i}">
-                <option value="">${i}位 プレイヤー選択</option>
-                ${Object.keys(players).map(name=>
-                    `<option value="${name}">${name}</option>`
-                ).join('')}
-            </select>
 
-            <input id="score${i}" type="number" placeholder="${i}位 スコア">
+        area.innerHTML += `
+
+        <select id="name${i}">
+
+            <option value="">
+            ${i}位 プレイヤー選択
+            </option>
+
+            ${Object.keys(players).map(name=>
+                `<option value="${name}">
+                ${name}
+                </option>`
+            ).join('')}
+
+        </select>
+
+        <input
+        id="score${i}"
+        type="number"
+        placeholder="${i}位 スコア">
+
         `;
     }
 }
 
 function addPlayer(){
-    const name = document.getElementById('newPlayer').value;
+
+    const name =
+    document.getElementById('newPlayer').value;
+
+    const icon =
+    document.getElementById('newIcon').value;
 
     if(!name) return;
 
     if(players[name]){
+
         alert('既に存在します');
+
         return;
     }
 
     players[name] = {
+
+        icon:
+        icon ||
+        'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+
         games:0,
         first:0,
         last:0,
@@ -245,60 +261,111 @@ function addPlayer(){
         money:0
     };
 
-    localStorage.setItem('players', JSON.stringify(players));
+    localStorage.setItem(
+        'players',
+        JSON.stringify(players)
+    );
 
     document.getElementById('newPlayer').value = '';
 
+    document.getElementById('newIcon').value = '';
+
     renderPlayers();
+
     renderInputs();
 }
 
 function renderPlayers(){
+
     const list = document.getElementById('playerList');
+
     list.innerHTML = '';
 
     Object.keys(players).forEach(name=>{
 
         const p = players[name];
 
-        const avg = p.games ?
-            (p.totalRank / p.games).toFixed(2) : 0;
+        const avg = p.games
+        ? (p.totalRank / p.games).toFixed(2)
+        : 0;
 
-        const firstRate = p.games ?
-            ((p.first / p.games) * 100).toFixed(1) : 0;
+        const firstRate = p.games
+        ? ((p.first / p.games) * 100).toFixed(1)
+        : 0;
 
         list.innerHTML += `
-            <div class="playerCard">
-                <h3>${name}</h3>
 
-                <p>対局数: ${p.games}</p>
-                <p>平均順位: ${avg}</p>
-                <p>1位率: ${firstRate}%</p>
+        <div class="playerCard">
 
-                <p class="${p.money >= 0 ? 'moneyPlus':'moneyMinus'}">
-                    収支: ${Math.round(p.money).toLocaleString()}円
-                </p>
+            <div style="
+            display:flex;
+            align-items:center;
+            gap:15px;
+            ">
+
+                <img
+                src="${p.icon}"
+                style="
+                width:70px;
+                height:70px;
+                border-radius:50%;
+                object-fit:cover;
+                border:3px solid gold;
+                ">
+
+                <div>
+
+                    <h3>${name}</h3>
+
+                    <p>対局数: ${p.games}</p>
+
+                    <p>平均順位: ${avg}</p>
+
+                    <p>1位率: ${firstRate}%</p>
+
+                    <p class="${
+                    p.money >= 0
+                    ? 'moneyPlus'
+                    : 'moneyMinus'
+                    }">
+
+                    収支:
+                    ${Math.round(p.money).toLocaleString()}円
+
+                    </p>
+
+                </div>
+
             </div>
+
+        </div>
+
         `;
     });
-
-    document.getElementById('playerCount').innerText =
-        Object.keys(players).length;
 }
 
 function saveMatch(){
-    const mode = Number(document.getElementById('mode').value);
-    const rate = Number(document.getElementById('rate').value);
+
+    const mode =
+    Number(document.getElementById('mode').value);
+
+    const rate =
+    Number(document.getElementById('rate').value);
 
     let data = [];
 
     for(let i=1;i<=mode;i++){
 
-        const name = document.getElementById('name'+i).value;
-        const score = Number(document.getElementById('score'+i).value);
+        const name =
+        document.getElementById('name'+i).value;
+
+        const score =
+        Number(document.getElementById('score'+i).value);
 
         if(!name){
+
             alert('プレイヤー選択');
+
             return;
         }
 
@@ -314,7 +381,9 @@ function saveMatch(){
         const money = player.score * rate;
 
         players[player.name].games += 1;
+
         players[player.name].totalRank += player.rank;
+
         players[player.name].money += money;
 
         if(player.rank === 1){
@@ -328,10 +397,18 @@ function saveMatch(){
 
     matches.push(data);
 
-    localStorage.setItem('players', JSON.stringify(players));
-    localStorage.setItem('matches', JSON.stringify(matches));
+    localStorage.setItem(
+        'players',
+        JSON.stringify(players)
+    );
+
+    localStorage.setItem(
+        'matches',
+        JSON.stringify(matches)
+    );
 
     renderPlayers();
+
     renderSettlement();
 
     alert('保存完了');
@@ -339,30 +416,44 @@ function saveMatch(){
 
 function renderSettlement(){
 
-    const area = document.getElementById('settlementList');
+    const area =
+    document.getElementById('settlementList');
+
     area.innerHTML = '';
 
-    const sorted = Object.entries(players)
-        .sort((a,b)=>b[1].money-a[1].money);
+    const sorted =
+    Object.entries(players)
+    .sort((a,b)=>b[1].money-a[1].money);
 
     let html = '<table>';
 
     html += `
-        <tr>
-            <th>名前</th>
-            <th>収支</th>
-        </tr>
+
+    <tr>
+        <th>名前</th>
+        <th>収支</th>
+    </tr>
+
     `;
 
     sorted.forEach(([name,data])=>{
 
         html += `
-            <tr>
-                <td>${name}</td>
-                <td class="${data.money >=0 ? 'moneyPlus':'moneyMinus'}">
-                    ${Math.round(data.money).toLocaleString()}円
-                </td>
-            </tr>
+
+        <tr>
+            <td>${name}</td>
+
+            <td class="${
+            data.money >=0
+            ? 'moneyPlus'
+            : 'moneyMinus'
+            }">
+
+            ${Math.round(data.money).toLocaleString()}円
+
+            </td>
+        </tr>
+
         `;
     });
 
@@ -374,12 +465,21 @@ function renderSettlement(){
 function saveSettings(){
 
     const settings = {
-        uma:document.getElementById('uma').value,
-        oka:document.getElementById('oka').value,
-        chip:document.getElementById('chip').value
+
+        uma:
+        document.getElementById('uma').value,
+
+        oka:
+        document.getElementById('oka').value,
+
+        chip:
+        document.getElementById('chip').value
     };
 
-    localStorage.setItem('settings', JSON.stringify(settings));
+    localStorage.setItem(
+        'settings',
+        JSON.stringify(settings)
+    );
 
     alert('設定保存');
 }
@@ -387,9 +487,10 @@ function saveSettings(){
 renderPlayers();
 renderSettlement();
 renderInputs();
-function startApp(){
-    document.getElementById('homeScreen').style.display = 'none';
-}
+
+document
+.getElementById('mode')
+.addEventListener('change',renderInputs);
 
 </script>
 
