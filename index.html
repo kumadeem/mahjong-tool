@@ -153,7 +153,6 @@ margin:0;
 
 <div class="nav">
 <button onclick="showPage('match')">対局入力</button>
-<button onclick="showPage('settlement')">精算</button>
 <button onclick="showPage('players')">プレイヤー</button>
 <button onclick="showPage('settings')">設定</button>
 </div>
@@ -192,6 +191,10 @@ margin:0;
 </tr>
 </thead>
 
+<select id="p1"></select>
+<select id="p2"></select>
+<select id="p3"></select>
+<select id="p4"></select>
 <tbody id="scoreBody"></tbody>
 
 </table>
@@ -457,7 +460,76 @@ document
 }
 
 renderPlayers();
+function loadPlayers(){
 
+const selects = ["p1","p2","p3","p4"];
+
+selects.forEach(id=>{
+
+const select =
+document.getElementById(id);
+
+select.innerHTML =
+'<option value="">選択</option>';
+
+for(const name in players){
+
+select.innerHTML += `
+<option value="${name}">
+${name}
+</option>
+`;
+
+}
+
+});
+
+}
+
+loadPlayers();
+
+function calculateTotal(){
+
+const rate =
+Number(
+document.getElementById('rate').value
+);
+
+let result =
+'<h3>精算結果</h3>';
+
+for(let i=1;i<=4;i++){
+
+let total = 0;
+
+document
+.querySelectorAll(`.player${i}`)
+.forEach(input=>{
+
+total += Number(input.value || 0);
+
+});
+
+const playerName =
+document.getElementById(`p${i}`).value;
+
+const money = total * rate;
+
+result += `
+<div class="box">
+${playerName}
+:
+${money.toLocaleString()}円
+</div>
+`;
+
+}
+
+document
+.getElementById('totalResult')
+.innerHTML = result;
+
+}
 </script>
 
 </body>
