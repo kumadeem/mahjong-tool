@@ -6,270 +6,303 @@
 <title>麻雀成績管理</title>
 
 <style>
+
 body{
-    margin:0;
-    background:#0d3b2e;
-    color:white;
-    font-family:sans-serif;
+margin:0;
+padding:0;
+font-family:sans-serif;
+background:linear-gradient(to bottom,#062d1d,#0d5c3a);
+color:white;
 }
 
-header{
-    text-align:center;
-    padding:20px;
-    font-size:32px;
-    font-weight:bold;
+#startScreen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+background:linear-gradient(to bottom,#061d1d,#0d5c3a);
+z-index:9999;
+}
+
+#startScreen h1{
+font-size:50px;
+margin-bottom:30px;
+}
+
+#startScreen button{
+padding:20px 50px;
+font-size:24px;
+border:none;
+border-radius:20px;
+background:gold;
+font-weight:bold;
 }
 
 .nav{
-    display:flex;
-    justify-content:space-around;
-    background:#111;
-    padding:10px;
-    position:sticky;
-    top:0;
+display:flex;
+justify-content:space-around;
+padding:20px;
+background:#111;
+position:sticky;
+top:0;
 }
 
 .nav button{
-    background:#1f1f1f;
-    color:white;
-    border:none;
-    padding:12px 18px;
-    border-radius:10px;
-    font-size:15px;
+padding:15px 25px;
+border:none;
+border-radius:15px;
+background:#1e1e1e;
+color:white;
+font-size:16px;
 }
 
 .page{
-    display:none;
-    padding:20px;
+display:none;
+padding:20px;
 }
 
 .active{
-    display:block;
+display:block;
 }
 
 .box{
-    background:rgba(0,0,0,0.5);
-    border:1px solid gold;
-    border-radius:15px;
-    padding:20px;
-    margin-bottom:20px;
+background:rgba(0,0,0,0.5);
+padding:20px;
+border-radius:20px;
+border:1px solid gold;
+margin-bottom:20px;
 }
 
 input,select{
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-    margin-bottom:10px;
-    border:none;
-    border-radius:10px;
-    background:#1f1f1f;
-    color:white;
-    box-sizing:border-box;
+width:100%;
+padding:15px;
+margin-top:10px;
+margin-bottom:10px;
+border:none;
+border-radius:10px;
+background:#1e1e1e;
+color:white;
+font-size:16px;
+box-sizing:border-box;
 }
 
-button.main{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    background:gold;
-    color:black;
-    font-weight:bold;
-    font-size:16px;
+button{
+cursor:pointer;
+}
+
+.mainBtn{
+width:100%;
+padding:15px;
+border:none;
+border-radius:15px;
+background:gold;
+font-size:18px;
+font-weight:bold;
+margin-top:10px;
 }
 
 .playerCard{
-    background:#1a1a1a;
-    border-radius:12px;
-    padding:15px;
-    margin-top:10px;
+display:flex;
+align-items:center;
+gap:15px;
+background:#1b1b1b;
+padding:15px;
+border-radius:15px;
+margin-top:10px;
 }
 
-.moneyPlus{
-    color:#6dff6d;
+.playerCard img{
+width:60px;
+height:60px;
+border-radius:50%;
+object-fit:cover;
 }
 
-.moneyMinus{
-    color:#ff7b7b;
+#scoreTable{
+width:100%;
+border-collapse:collapse;
+text-align:center;
+background:#0d3b2d;
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
+#scoreTable th,
+#scoreTable td{
+border:1px solid gray;
+padding:10px;
 }
 
-td,th{
-    padding:10px;
-    border-bottom:1px solid #333;
-    text-align:center;
+#scoreTable input{
+width:90%;
+padding:10px;
+margin:0;
 }
+
 </style>
 </head>
 <body>
 
-<header>
-麻雀成績管理
-</header>
+<div id="startScreen">
+<h1>麻雀成績管理</h1>
+<button onclick="startApp()">START</button>
+</div>
 
-<div id="startScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom,#061d1d,#0d5c3a);display:flex;justify-content:center;align-items:center;z-index:9999;flex-direction:column;">
+<div class="nav">
+<button onclick="showPage('match')">対局入力</button>
+<button onclick="showPage('settlement')">精算</button>
+<button onclick="showPage('players')">プレイヤー</button>
+<button onclick="showPage('settings')">設定</button>
+</div>
 
-<h1 style="font-size:48px;margin-bottom:30px;">
-麻雀成績管理
-</h1>
+<div id="match" class="page active">
 
-<button onclick="startApp()" style="padding:20px 50px;font-size:24px;border:none;border-radius:20px;background:gold;color:black;font-weight:bold;">
-START
+<h2>麻雀スコアシート</h2>
+
+<div class="box">
+
+<select id="mode">
+<option value="4">4麻</option>
+<option value="3">3麻</option>
+</select>
+
+<input id="rate" placeholder="レート">
+
+<input id="uma" placeholder="ウマオカ 例:10,20">
+
+<button class="mainBtn" onclick="startMatch()">
+対局開始
 </button>
 
 </div>
 
-<div class="nav">
-    <button onclick="showPage('match')">対局入力</button>
-    <button onclick="showPage('settlement')">精算</button>
-    <button onclick="showPage('players')">プレイヤー</button>
-    <button onclick="showPage('settings')">設定</button>
+<div class="box">
+
+<table id="scoreTable">
+<thead>
+<tr>
+<th>局</th>
+<th>プレイヤー1</th>
+<th>プレイヤー2</th>
+<th>プレイヤー3</th>
+<th>プレイヤー4</th>
+</tr>
+</thead>
+
+<tbody id="scoreBody"></tbody>
+
+</table>
+
+<button class="mainBtn" onclick="addRound()">
+局追加
+</button>
+
+<button class="mainBtn" onclick="calculateTotal()">
+集計
+</button>
+
+<div id="totalResult"></div>
+
 </div>
 
-<div id="match" class="page active">
-    <div class="box">
-        <h2>対局入力</h2>
-
-        <select id="mode">
-            <option value="4">4麻</option>
-            <option value="3">3麻</option>
-        </select>
-
-        <input id="rate" type="number" placeholder="レート" value="500">
-
-        <div id="inputs"></div>
-
-        <button class="main" onclick="saveMatch()">
-            保存
-        </button>
-    </div>
 </div>
 
 <div id="settlement" class="page">
-    <div class="box">
-        <h2>精算</h2>
-
-        <div id="settlementList"></div>
-    </div>
+<h2>精算</h2>
+<div class="box">
+<div id="settlementResult">
+まだ集計されていません
+</div>
+</div>
 </div>
 
 <div id="players" class="page">
 
-    <div class="box">
-        <h2>アカウント作成</h2>
+<h2>プレイヤー管理</h2>
 
-        <input id="newPlayer" placeholder="プレイヤー名">
+<div class="box">
 
-        <input id="newIcon"
+<input id="newPlayer" placeholder="プレイヤー名">
+
+<input
+id="newIcon"
 type="file"
 accept="image/*">
 
-        <button class="main"
-        onclick="addPlayer()">
-        プレイヤー追加
-        </button>
-    </div>
+<button class="mainBtn" onclick="addPlayer()">
+追加
+</button>
 
-    <div class="box">
-        <h2>プレイヤー一覧</h2>
+</div>
 
-        <div id="playerList"></div>
-    </div>
+<div id="playerList"></div>
+
 </div>
 
 <div id="settings" class="page">
-    <div class="box">
-        <h2>設定</h2>
 
-        <input id="uma" placeholder="ウマ 例: 10,20">
-        <input id="oka" placeholder="オカ">
-        <input id="chip" placeholder="チップレート">
+<h2>設定</h2>
 
-        <button class="main" onclick="saveSettings()">
-            設定保存
-        </button>
-    </div>
+<div class="box">
+
+<p>今後追加予定</p>
+
+</div>
+
 </div>
 
 <script>
-const pages = document.querySelectorAll('.page');
 
-function showPage(id){
-    pages.forEach(page=>{
-        page.classList.remove('active');
-    });
+let players = JSON.parse(
+localStorage.getItem('players')
+) || {};
 
-    document.getElementById(id).classList.add('active');
+function startApp(){
+
+document
+.getElementById('startScreen')
+.style.display = 'none';
+
 }
 
-let players = JSON.parse(localStorage.getItem('players')) || {};
-let matches = JSON.parse(localStorage.getItem('matches')) || [];
+function showPage(id){
 
-function renderInputs(){
+const pages = document
+.querySelectorAll('.page');
 
-    const area = document.getElementById('inputs');
+pages.forEach(page=>{
+page.classList.remove('active');
+});
 
-    area.innerHTML = '';
 
-    const mode = Number(document.getElementById('mode').value);
+document
+.getElementById(id)
+.classList.add('active');
 
-    for(let i=1;i<=mode;i++){
-
-        area.innerHTML += `
-
-        <select id="name${i}">
-
-            <option value="">
-            ${i}位 プレイヤー選択
-            </option>
-
-            ${Object.keys(players).map(name=>
-                `<option value="${name}">
-                ${name}
-                </option>`
-            ).join('')}
-
-        </select>
-
-        <input
-        id="score${i}"
-        type="number"
-        placeholder="${i}位 スコア">
-
-        `;
-    }
 }
 
 function addPlayer(){
 
-    const name =
-    document.getElementById('newPlayer').value;
+const name = document
+.getElementById('newPlayer')
+.value;
 
-    const file =
-document.getElementById('newIcon').files[0];
+const file = document
+.getElementById('newIcon')
+.files[0];
 
-    if(!name) return;
+if(!name){
+alert('名前を入力');
+return;
+}
 
-    if(players[name]){
-
-        alert('既に存在します');
-
-        return;
-    }
-
-    const savePlayer = (iconData) => {
+const savePlayer = (icon)=>{
 
 players[name] = {
-icon: iconData || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
-games:0,
-first:0,
-last:0,
-totalRank:0,
-money:0
+icon:icon,
 };
 
 localStorage.setItem(
@@ -278,7 +311,7 @@ JSON.stringify(players)
 );
 
 renderPlayers();
-renderInputs();
+
 };
 
 if(file){
@@ -293,300 +326,137 @@ reader.readAsDataURL(file);
 
 }else{
 
-savePlayer();
+savePlayer('https://cdn-icons-png.flaticon.com/512/149/149071.png');
 
 }
 
-    localStorage.setItem(
-        'players',
-        JSON.stringify(players)
-    );
-
-    document.getElementById('newPlayer').value = '';
-
-    document.getElementById('newIcon').value = '';
-
-    renderPlayers();
-
-    renderInputs();
 }
 
 function renderPlayers(){
 
-    const list = document.getElementById('playerList');
+const list = document
+.getElementById('playerList');
 
-    list.innerHTML = '';
+list.innerHTML = '';
 
-    Object.keys(players).forEach(name=>{
+for(const name in players){
 
-        const p = players[name];
+const div = document.createElement('div');
 
-        const avg = p.games
-        ? (p.totalRank / p.games).toFixed(2)
-        : 0;
+div.className = 'playerCard';
 
-        const firstRate = p.games
-        ? ((p.first / p.games) * 100).toFixed(1)
-        : 0;
+div.innerHTML = `
+<img src="${players[name].icon}">
+<h3>${name}</h3>
+`;
 
-        list.innerHTML += `
-
-        <div class="playerCard">
-
-            <div style="
-            display:flex;
-            align-items:center;
-            gap:15px;
-            ">
-
-                <img
-                src="${p.icon}"
-                style="
-                width:70px;
-                height:70px;
-                border-radius:50%;
-                object-fit:cover;
-                border:3px solid gold;
-                ">
-
-                <div>
-
-                    <h3>${name}</h3>
-
-                    <p>対局数: ${p.games}</p>
-
-                    <p>平均順位: ${avg}</p>
-
-                    <p>1位率: ${firstRate}%</p>
-
-                    <p class="${
-                    p.money >= 0
-                    ? 'moneyPlus'
-                    : 'moneyMinus'
-                    }">
-
-                    収支:
-                    ${Math.round(p.money).toLocaleString()}円
-
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        `;
-    });
-}
-
-function saveMatch(){
-
-    const mode =
-    Number(document.getElementById('mode').value);
-
-    const rate =
-    Number(document.getElementById('rate').value);
-
-    let data = [];
-
-    for(let i=1;i<=mode;i++){
-
-        const name =
-        document.getElementById('name'+i).value;
-
-        const score =
-        Number(document.getElementById('score'+i).value);
-
-        if(!name){
-
-            alert('プレイヤー選択');
-
-            return;
-        }
-
-        data.push({
-            rank:i,
-            name,
-            score
-        });
-    }
-
-    data.forEach(player=>{
-
-        const money = player.score * rate;
-
-        players[player.name].games += 1;
-
-        players[player.name].totalRank += player.rank;
-
-        players[player.name].money += money;
-
-        if(player.rank === 1){
-            players[player.name].first += 1;
-        }
-
-        if(player.rank === mode){
-            players[player.name].last += 1;
-        }
-    });
-
-    matches.push(data);
-
-    localStorage.setItem(
-        'players',
-        JSON.stringify(players)
-    );
-
-    localStorage.setItem(
-        'matches',
-        JSON.stringify(matches)
-    );
-
-    renderPlayers();
-
-    renderSettlement();
-
-    alert('保存完了');
-}
-
-function renderSettlement(){
-
-    const area =
-    document.getElementById('settlementList');
-
-    area.innerHTML = '';
-
-    const sorted =
-    Object.entries(players)
-    .sort((a,b)=>b[1].money-a[1].money);
-
-    let html = '<table>';
-
-    html += `
-
-    <tr>
-        <th>名前</th>
-        <th>収支</th>
-    </tr>
-
-    `;
-
-    sorted.forEach(([name,data])=>{
-
-        html += `
-
-        <tr>
-            <td>${name}</td>
-
-            <td class="${
-            data.money >=0
-            ? 'moneyPlus'
-            : 'moneyMinus'
-            }">
-
-            ${Math.round(data.money).toLocaleString()}円
-
-            </td>
-        </tr>
-
-        `;
-    });
-
-    html += '</table>';
-
-    area.innerHTML = html;
-}
-
-function saveSettings(){
-
-    const settings = {
-
-        uma:
-        document.getElementById('uma').value,
-
-        oka:
-        document.getElementById('oka').value,
-
-        chip:
-        document.getElementById('chip').value
-    };
-
-    localStorage.setItem(
-        'settings',
-        JSON.stringify(settings)
-    );
-
-    alert('設定保存');
-}
-
-renderPlayers();
-renderSettlement();
-renderInputs();
-
-document
-.getElementById('mode')
-.addEventListener('change',renderInputs);
-
-function startApp(){
-
-document.getElementById('startScreen').style.display = 'none';
+list.appendChild(div);
 
 }
-
-
-
-function startMatch(){
-
-showPage('match');
-
-addRound();
 
 }
 
 let roundCount = 0;
 
+function startMatch(){
+
+roundCount = 0;
+
+const body = document
+.getElementById('scoreBody');
+
+body.innerHTML = '';
+
+addRound();
+
+}
+
 function addRound(){
 
 roundCount++;
 
-const table = document.getElementById('scoreBody');
+const mode = Number(
+document.getElementById('mode').value
+);
 
-if(!table) return;
+const tbody = document
+.getElementById('scoreBody');
 
 const tr = document.createElement('tr');
 
-tr.innerHTML = `
+let html = `
 <td>${roundCount}</td>
-<td><input type="number" class="p1"></td>
-<td><input type="number" class="p2"></td>
-<td><input type="number" class="p3"></td>
-<td><input type="number" class="p4"></td>
 `;
 
-table.appendChild(tr);
+for(let i=1;i<=mode;i++){
+
+html += `
+<td>
+<input class="player${i}" type="number">
+</td>
+`;
+
+}
+
+tr.innerHTML = html;
+
+tbody.appendChild(tr);
 
 }
 
 function calculateTotal(){
 
-const sum = (cls) => {
-let total = 0;
-document.querySelectorAll(cls).forEach(v=>{
- total += Number(v.value || 0);
-});
-return total;
-};
+const mode = Number(
+document.getElementById('mode').value
+);
 
-document.getElementById('totalResult').innerHTML = `
-<h3>合計</h3>
-<p>P1 : ${sum('.p1')}</p>
-<p>P2 : ${sum('.p2')}</p>
-<p>P3 : ${sum('.p3')}</p>
-<p>P4 : ${sum('.p4')}</p>
+let result = '<h3>合計結果</h3>';
+
+for(let i=1;i<=mode;i++){
+
+let total = 0;
+
+const inputs = document
+.querySelectorAll(`.player${i}`);
+
+inputs.forEach(input=>{
+
+total += Number(input.value || 0);
+
+});
+
+result += `
+<p>
+プレイヤー${i} : ${total}
+</p>
 `;
 
 }
+
+result += `
+<hr>
+<p>
+レート : ${document.getElementById('rate').value}
+</p>
+
+<p>
+ウマオカ : ${document.getElementById('uma').value}
+</p>
+`;
+
+
+document
+.getElementById('totalResult')
+.innerHTML = result;
+
+
+document
+.getElementById('settlementResult')
+.innerHTML = result;
+
+}
+
+renderPlayers();
 
 </script>
 
