@@ -534,6 +534,60 @@ document.getElementById('startScreen').style.display = 'none';
 
 }
 
+
+
+function startMatch(){
+
+showPage('match');
+
+addRound();
+
+}
+
+let roundCount = 0;
+
+function addRound(){
+
+roundCount++;
+
+const table = document.getElementById('scoreBody');
+
+if(!table) return;
+
+const tr = document.createElement('tr');
+
+tr.innerHTML = `
+<td>${roundCount}</td>
+<td><input type="number" class="p1"></td>
+<td><input type="number" class="p2"></td>
+<td><input type="number" class="p3"></td>
+<td><input type="number" class="p4"></td>
+`;
+
+table.appendChild(tr);
+
+}
+
+function calculateTotal(){
+
+const sum = (cls) => {
+let total = 0;
+document.querySelectorAll(cls).forEach(v=>{
+ total += Number(v.value || 0);
+});
+return total;
+};
+
+document.getElementById('totalResult').innerHTML = `
+<h3>合計</h3>
+<p>P1 : ${sum('.p1')}</p>
+<p>P2 : ${sum('.p2')}</p>
+<p>P3 : ${sum('.p3')}</p>
+<p>P4 : ${sum('.p4')}</p>
+`;
+
+}
+
 </script>
 
 </body>
