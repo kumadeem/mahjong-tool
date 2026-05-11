@@ -1,10 +1,30 @@
+# 麻雀成績管理アップグレード
 
+追加する機能：
+
+* 履歴保存
+* 精算自動化
+* 雀魂風デザイン
+
+---
+
+## ① まずやること
+
+GitHub の `index.html` を開いて、今のコードを全部消してください。
+
+そのあと、下のコードを全部貼って `Commit changes` を押します。
+
+---
+
+## ② 追加コード
+
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>　麻雀成績管理</title>
+<title>雀魂風 麻雀成績管理</title>
 
 <style>
 
@@ -86,7 +106,7 @@ button:hover{
 
 <body>
 
-<h1>🀄  麻雀成績管理</h1>
+<h1>🀄 雀魂風 麻雀成績管理</h1>
 
 <div class="box">
 <h2>設定</h2>
@@ -280,7 +300,19 @@ toggleMode();
 </script>
 
 </body>
+</html>
 ```
 
 ---
 
+## ③ 保存
+
+下までスクロールして：
+
+* `Commit changes`
+
+を押してください。
+
+そのあと数十秒待つと、Vercel側が自動更新されます。
+
+スマホで再読み込みすると新機能版になります。
