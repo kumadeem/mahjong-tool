@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>麻雀成績管理</title>
+
+<style>
+
+body{
+  margin:0;
+  padding:20px;
+  background:#0f4f2f;
+  color:white;
+  font-family:sans-serif;
+}
+
+h1,h2{
+  text-align:center;
+}
+
+.box{
+  background:#1b1b1b;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  box-sizing:border-box;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border:none;
+  border-radius:10px;
+  background:gold;
+  color:black;
+  font-weight:bold;
+  font-size:16px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #444;
+  text-align:center;
+}
+
+.plus{
+  color:#00ff99;
+  font-weight:bold;
+}
+
+.minus{
+  color:#ff6666;
+  font-weight:bold;
+}
+
+.card{
+  background:#222;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🀄 麻雀成績管理</h1>
+
+<div class="box">
+
+<h2>設定</h2>
+
+<select id="mode">
+  <option value="4">4麻</option>
+  <option value="3">3麻</option>
+</select>
+
+<input type="number" id="rate" value="500" placeholder="レート">
+
+<input type="number" id="oka" value="20" placeholder="オカ">
+
+<input type="text" id="uma" value="10,20" placeholder="ウマ">
+
+</div>
+
+<div class="box">
+
+<h2>対局入力</h2>
+
+<input type="text" id="name1" placeholder="1位 名前">
+<input type="number" id="score1" placeholder="1位 スコア">
+
+<input type="text" id="name2" placeholder="2位 名前">
+<input type="number" id="score2" placeholder="2位 スコア">
+
+<input type="text" id="name3" placeholder="3位 名前">
+<input type="number" id="score3" placeholder="3位 スコア">
+
+<div id="player4">
+
+<input type="text" id="name4" placeholder="4位 名前">
+<input type="number" id="score4" placeholder="4位 スコア">
+
+</div>
+
+<button onclick="saveGame()">
+保存
+</button>
+
+</div>
+
+<div class="box">
+
+<h2>本日の精算</h2>
+
+<div id="settlement"></div>
+
+</div>
+
+<div class="box">
+
+<h2>成績</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>名前</th>
+<th>対局</th>
+<th>平均順位</th>
+<th>1位率</th>
+<th>ラス率</th>
+<th>収支</th>
+</tr>
+</thead>
+
+<tbody id="stats"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+let players =
+JSON.parse(localStorage.getItem("mahjongPlayers")) || {};
+
+document
+.getElementById("mode")
+.addEventListener("change", toggleMode);
+
+function toggleMode(){
+
+  const mode =
+  document.getElementById("mode").value;
+
+  const player4 =
+  document.getElementById("player4");
+
+  if(mode == "3"){
+
+    player4.style.display = "none";
+
+  }else{
+
+    player4.style.display = "block";
+  }
+}
+
+function addPlayer(name){
+
+  if(!players[name]){
+
+    players[name] = {
+
+      games:0,
+      totalRank:0,
+      first:0,
+      last:0,
+      money:0
+
+    };
+  }
+}
+
+function saveGame(){
+
+  const mode =
+  Number(document.getElementById("mode").value);
+
+  const rate =
+  Number(document.getElementById("rate").value);
+
+  const oka =
+  Number(document.getElementById("oka").value);
+
+  const uma =
+  document.getElementById("uma")
+  .value
+  .split(",")
+  .map(Number);
+
+  const data = [];
+
+  for(let i=1;i<=mode;i++){
+
+    const name =
+    document.getElementById("name"+i).value;
+
+    const score =
+    Number(document.getElementById("score"+i).value);
+
+    if(!name){
+
+      alert("名前を入力してください");
+
+      return;
+    }
+
+    data.push({
+      rank:i,
+      name:name,
+      score:score
+    });
+
+    addPlayer(name);
+  }
+
+  data.forEach(player=>{
+
+    let point = player.score;
+
+    if(mode == 4){
+
+      if(player.rank == 1){
+
+        point += oka + uma[1];
+
+      }else if(player.rank == 2){
+
+        point += uma[0];
+
+      }else if(player.rank == 3){
+
+        point -= uma[0];
+
+      }else{
+
+        point -= oka + uma[1];
+      }
+
+    }else{
+
+      if(player.rank == 1){
+
+        point += oka + uma[0];
+
+      }else if(player.rank == 2){
+
+        point += 0;
+
+      }else{
+
+        point -= oka + uma[0];
+      }
+    }
+
+    const money =
+    point * rate / 100;
+
+    players[player.name].games += 1;
+
+    players[player.name].totalRank += player.rank;
+
+    if(player.rank == 1){
+
+      players[player.name].first += 1;
+    }
+
+    if(player.rank == mode){
+
+      players[player.name].last += 1;
+    }
+
+    players[player.name].money += money;
+
+  });
+
+  localStorage.setItem(
+    "mahjongPlayers",
+    JSON.stringify(players)
+  );
+
+  renderSettlement(data, rate);
+
+  renderStats();
+
+}
+
+function renderSettlement(data, rate){
+
+  const settlement =
+  document.getElementById("settlement");
+
+  settlement.innerHTML = "";
+
+  data.forEach(player=>{
+
+    const money =
+    player.score * rate / 100;
+
+    const div =
+    document.createElement("div");
+
+    div.className = "card";
+
+    div.innerHTML = `
+      <h3>${player.name}</h3>
+      <p class="${money >= 0 ? "plus":"minus"}">
+      ${money >= 0 ? "+" : ""}
+      ${money.toLocaleString()} 円
+      </p>
+    `;
+
+    settlement.appendChild(div);
+
+  });
+
+}
+
+function renderStats(){
+
+  const stats =
+  document.getElementById("stats");
+
+  stats.innerHTML = "";
+
+  Object.entries(players)
+  .forEach(([name,data])=>{
+
+    const avg =
+    (
+      data.totalRank /
+      data.games
+    ).toFixed(2);
+
+    const firstRate =
+    (
+      data.first /
+      data.games * 100
+    ).toFixed(1);
+
+    const lastRate =
+    (
+      data.last /
+      data.games * 100
+    ).toFixed(1);
+
+    const tr =
+    document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${name}</td>
+
+      <td>${data.games}</td>
+
+      <td>${avg}</td>
+
+      <td>${firstRate}%</td>
+
+      <td>${lastRate}%</td>
+
+      <td class="${data.money >= 0 ? "plus":"minus"}">
+        ${Math.round(data.money).toLocaleString()} 円
+      </td>
+    `;
+
+    stats.appendChild(tr);
+
+  });
+
+}
+
+toggleMode();
+
+renderStats();
+
+</script>
+
+</body>
+</html>
