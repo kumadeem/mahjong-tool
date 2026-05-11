@@ -184,10 +184,21 @@ margin:0;
 <thead>
 <tr>
 <th>局</th>
-<th>プレイヤー1</th>
-<th>プレイヤー2</th>
-<th>プレイヤー3</th>
-<th>プレイヤー4</th>
+<th>
+<select id="player1Select"></select>
+</th>
+
+<th>
+<select id="player2Select"></select>
+</th>
+
+<th>
+<select id="player3Select"></select>
+</th>
+
+<th>
+<select id="player4Select"></select>
+</th>
 </tr>
 </thead>
 
@@ -530,6 +541,37 @@ document
 .innerHTML = result;
 
 }
+function loadPlayerSelects(){
+
+const ids = [
+'player1Select',
+'player2Select',
+'player3Select',
+'player4Select'
+];
+
+ids.forEach(id=>{
+
+const select =
+document.getElementById(id);
+
+select.innerHTML = '';
+
+for(const name in players){
+
+select.innerHTML += `
+<option value="${name}">
+${name}
+</option>
+`;
+
+}
+
+});
+
+}
+
+loadPlayerSelects();
 </script>
 
 </body>
