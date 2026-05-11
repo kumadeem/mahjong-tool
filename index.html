@@ -1,318 +1,386 @@
-# 麻雀成績管理アップグレード
-
-追加する機能：
-
-* 履歴保存
-* 精算自動化
-* 雀魂風デザイン
-
----
-
-## ① まずやること
-
-GitHub の `index.html` を開いて、今のコードを全部消してください。
-
-そのあと、下のコードを全部貼って `Commit changes` を押します。
-
----
-
-## ② 追加コード
-
-```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>雀魂風 麻雀成績管理</title>
+<title>麻雀成績管理</title>
 
 <style>
-
 body{
-  margin:0;
-  padding:20px;
-  background:linear-gradient(to bottom,#062d1d,#0d5c3a);
-  color:white;
-  font-family:sans-serif;
+    margin:0;
+    background:#0d3b2e;
+    color:white;
+    font-family:sans-serif;
 }
 
-h1,h2{
-  text-align:center;
+header{
+    text-align:center;
+    padding:20px;
+    font-size:32px;
+    font-weight:bold;
+}
+
+.nav{
+    display:flex;
+    justify-content:space-around;
+    background:#111;
+    padding:10px;
+    position:sticky;
+    top:0;
+}
+
+.nav button{
+    background:#1f1f1f;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    font-size:15px;
+}
+
+.page{
+    display:none;
+    padding:20px;
+}
+
+.active{
+    display:block;
 }
 
 .box{
-  background:rgba(0,0,0,0.6);
-  border:1px solid gold;
-  border-radius:20px;
-  padding:20px;
-  margin-bottom:20px;
-  box-shadow:0 0 15px rgba(255,215,0,0.3);
+    background:rgba(0,0,0,0.5);
+    border:1px solid gold;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
 }
 
 input,select{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:12px;
-  font-size:16px;
-  box-sizing:border-box;
-  background:#1f1f1f;
-  color:white;
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    margin-bottom:10px;
+    border:none;
+    border-radius:10px;
+    background:#1f1f1f;
+    color:white;
+    box-sizing:border-box;
 }
 
-button{
-  width:100%;
-  padding:14px;
-  margin-top:15px;
-  border:none;
-  border-radius:12px;
-  background:gold;
-  color:black;
-  font-weight:bold;
-  font-size:16px;
+button.main{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    background:gold;
+    color:black;
+    font-weight:bold;
+    font-size:16px;
 }
 
-button:hover{
-  opacity:0.9;
+.playerCard{
+    background:#1a1a1a;
+    border-radius:12px;
+    padding:15px;
+    margin-top:10px;
 }
 
-.card{
-  background:#1c1c1c;
-  border-radius:15px;
-  padding:15px;
-  margin-top:10px;
+.moneyPlus{
+    color:#6dff6d;
 }
 
-.plus{
-  color:#00ff99;
-  font-weight:bold;
+.moneyMinus{
+    color:#ff7b7b;
 }
 
-.minus{
-  color:#ff6666;
-  font-weight:bold;
+table{
+    width:100%;
+    border-collapse:collapse;
 }
 
-.historyItem{
-  background:#202020;
-  border-radius:10px;
-  padding:10px;
-  margin-top:10px;
+td,th{
+    padding:10px;
+    border-bottom:1px solid #333;
+    text-align:center;
 }
-
 </style>
 </head>
-
 <body>
 
-<h1>🀄 雀魂風 麻雀成績管理</h1>
+<header>
+麻雀成績管理
+</header>
 
-<div class="box">
-<h2>設定</h2>
-
-<select id="mode">
-<option value="4">4麻</option>
-<option value="3">3麻</option>
-</select>
-
-<input type="number" id="rate" value="500" placeholder="レート">
-<input type="number" id="oka" value="20" placeholder="オカ">
-<input type="text" id="uma" value="10,20" placeholder="ウマ">
-
+<div class="nav">
+    <button onclick="showPage('home')">ホーム</button>
+    <button onclick="showPage('match')">対局入力</button>
+    <button onclick="showPage('settlement')">精算</button>
+    <button onclick="showPage('players')">プレイヤー</button>
+    <button onclick="showPage('settings')">設定</button>
 </div>
 
-<div class="box">
-<h2>対局入力</h2>
-
-<input type="text" id="name1" placeholder="1位 名前">
-<input type="number" id="score1" placeholder="1位 スコア">
-
-<input type="text" id="name2" placeholder="2位 名前">
-<input type="number" id="score2" placeholder="2位 スコア">
-
-<input type="text" id="name3" placeholder="3位 名前">
-<input type="number" id="score3" placeholder="3位 スコア">
-
-<div id="player4">
-<input type="text" id="name4" placeholder="4位 名前">
-<input type="number" id="score4" placeholder="4位 スコア">
+<div id="home" class="page active">
+    <div class="box">
+        <h2>ホーム</h2>
+        <p>麻雀成績管理アプリ</p>
+        <p>現在登録人数: <span id="playerCount">0</span>人</p>
+    </div>
 </div>
 
-<button onclick="saveGame()">保存</button>
+<div id="match" class="page">
+    <div class="box">
+        <h2>対局入力</h2>
 
+        <select id="mode">
+            <option value="4">4麻</option>
+            <option value="3">3麻</option>
+        </select>
+
+        <input id="rate" type="number" placeholder="レート">
+
+        <div id="inputs"></div>
+
+        <button class="main" onclick="saveMatch()">
+            保存
+        </button>
+    </div>
 </div>
 
-<div class="box">
-<h2>精算</h2>
-<div id="settlement"></div>
+<div id="settlement" class="page">
+    <div class="box">
+        <h2>精算</h2>
+
+        <div id="settlementList"></div>
+    </div>
 </div>
 
-<div class="box">
-<h2>履歴</h2>
-<div id="history"></div>
+<div id="players" class="page">
+    <div class="box">
+        <h2>アカウント作成</h2>
+
+        <input id="newPlayer" placeholder="プレイヤー名">
+
+        <button class="main" onclick="addPlayer()">
+            プレイヤー追加
+        </button>
+    </div>
+
+    <div class="box">
+        <h2>プレイヤー一覧</h2>
+
+        <div id="playerList"></div>
+    </div>
+</div>
+
+<div id="settings" class="page">
+    <div class="box">
+        <h2>設定</h2>
+
+        <input id="uma" placeholder="ウマ 例: 10,20">
+        <input id="oka" placeholder="オカ">
+        <input id="chip" placeholder="チップレート">
+
+        <button class="main" onclick="saveSettings()">
+            設定保存
+        </button>
+    </div>
 </div>
 
 <script>
+const pages = document.querySelectorAll('.page');
 
-let historyData = JSON.parse(localStorage.getItem("historyData")) || [];
-
-function toggleMode(){
-
-  const mode = document.getElementById("mode").value;
-
-  if(mode == "3"){
-    document.getElementById("player4").style.display = "none";
-  }else{
-    document.getElementById("player4").style.display = "block";
-  }
-}
-
-function saveGame(){
-
-  const mode = Number(document.getElementById("mode").value);
-  const rate = Number(document.getElementById("rate").value);
-
-  const players = [];
-
-  for(let i=1;i<=mode;i++){
-
-    const name = document.getElementById("name"+i).value;
-    const score = Number(document.getElementById("score"+i).value);
-
-    players.push({
-      rank:i,
-      name:name,
-      score:score,
-      money:score * rate / 100
+function showPage(id){
+    pages.forEach(page=>{
+        page.classList.remove('active');
     });
-  }
 
-  historyData.unshift({
-    date:new Date().toLocaleString(),
-    players:players
-  });
-
-  localStorage.setItem(
-    "historyData",
-    JSON.stringify(historyData)
-  );
-
-  renderSettlement(players);
-  renderHistory();
+    document.getElementById(id).classList.add('active');
 }
 
-function renderSettlement(players){
+let players = JSON.parse(localStorage.getItem('players')) || {};
+let matches = JSON.parse(localStorage.getItem('matches')) || [];
 
-  const box = document.getElementById("settlement");
+function renderInputs(){
+    const area = document.getElementById('inputs');
+    area.innerHTML = '';
 
-  box.innerHTML = "";
+    const mode = Number(document.getElementById('mode').value);
 
-  players.forEach(p=>{
+    for(let i=1;i<=mode;i++){
+        area.innerHTML += `
+            <select id="name${i}">
+                <option value="">${i}位 プレイヤー選択</option>
+                ${Object.keys(players).map(name=>
+                    `<option value="${name}">${name}</option>`
+                ).join('')}
+            </select>
 
-    const div = document.createElement("div");
+            <input id="score${i}" type="number" placeholder="${i}位 スコア">
+        `;
+    }
+}
 
-    div.className = "card";
+function addPlayer(){
+    const name = document.getElementById('newPlayer').value;
 
-    div.innerHTML = `
-      <h3>${p.name}</h3>
-      <p class="${p.money >= 0 ? 'plus':'minus'}">
-      ${p.money >=0 ? '+' : ''}
-      ${Math.round(p.money).toLocaleString()} 円
-      </p>
+    if(!name) return;
+
+    if(players[name]){
+        alert('既に存在します');
+        return;
+    }
+
+    players[name] = {
+        games:0,
+        first:0,
+        last:0,
+        totalRank:0,
+        money:0
+    };
+
+    localStorage.setItem('players', JSON.stringify(players));
+
+    document.getElementById('newPlayer').value = '';
+
+    renderPlayers();
+    renderInputs();
+}
+
+function renderPlayers(){
+    const list = document.getElementById('playerList');
+    list.innerHTML = '';
+
+    Object.keys(players).forEach(name=>{
+
+        const p = players[name];
+
+        const avg = p.games ?
+            (p.totalRank / p.games).toFixed(2) : 0;
+
+        const firstRate = p.games ?
+            ((p.first / p.games) * 100).toFixed(1) : 0;
+
+        list.innerHTML += `
+            <div class="playerCard">
+                <h3>${name}</h3>
+
+                <p>対局数: ${p.games}</p>
+                <p>平均順位: ${avg}</p>
+                <p>1位率: ${firstRate}%</p>
+
+                <p class="${p.money >= 0 ? 'moneyPlus':'moneyMinus'}">
+                    収支: ${Math.round(p.money).toLocaleString()}円
+                </p>
+            </div>
+        `;
+    });
+
+    document.getElementById('playerCount').innerText =
+        Object.keys(players).length;
+}
+
+function saveMatch(){
+    const mode = Number(document.getElementById('mode').value);
+    const rate = Number(document.getElementById('rate').value);
+
+    let data = [];
+
+    for(let i=1;i<=mode;i++){
+
+        const name = document.getElementById('name'+i).value;
+        const score = Number(document.getElementById('score'+i).value);
+
+        if(!name){
+            alert('プレイヤー選択');
+            return;
+        }
+
+        data.push({
+            rank:i,
+            name,
+            score
+        });
+    }
+
+    data.forEach(player=>{
+
+        const money = player.score * rate;
+
+        players[player.name].games += 1;
+        players[player.name].totalRank += player.rank;
+        players[player.name].money += money;
+
+        if(player.rank === 1){
+            players[player.name].first += 1;
+        }
+
+        if(player.rank === mode){
+            players[player.name].last += 1;
+        }
+    });
+
+    matches.push(data);
+
+    localStorage.setItem('players', JSON.stringify(players));
+    localStorage.setItem('matches', JSON.stringify(matches));
+
+    renderPlayers();
+    renderSettlement();
+
+    alert('保存完了');
+}
+
+function renderSettlement(){
+
+    const area = document.getElementById('settlementList');
+    area.innerHTML = '';
+
+    const sorted = Object.entries(players)
+        .sort((a,b)=>b[1].money-a[1].money);
+
+    let html = '<table>';
+
+    html += `
+        <tr>
+            <th>名前</th>
+            <th>収支</th>
+        </tr>
     `;
 
-    box.appendChild(div);
-  });
+    sorted.forEach(([name,data])=>{
 
-  autoSettlement(players);
-}
-
-function autoSettlement(players){
-
-  const plus = players.filter(p=>p.money > 0);
-  const minus = players.filter(p=>p.money < 0);
-
-  const box = document.getElementById("settlement");
-
-  const title = document.createElement("h3");
-  title.innerText = "自動精算";
-
-  box.appendChild(title);
-
-  minus.forEach(m=>{
-
-    let debt = Math.abs(m.money);
-
-    plus.forEach(p=>{
-
-      if(debt <= 0) return;
-
-      if(p.money <= 0) return;
-
-      const pay = Math.min(debt,p.money);
-
-      p.money -= pay;
-      debt -= pay;
-
-      const div = document.createElement("div");
-
-      div.className = "historyItem";
-
-      div.innerHTML = `
-      ${m.name} → ${p.name}
-      ：${Math.round(pay).toLocaleString()}円
-      `;
-
-      box.appendChild(div);
-    });
-  });
-}
-
-function renderHistory(){
-
-  const history = document.getElementById("history");
-
-  history.innerHTML = "";
-
-  historyData.forEach(game=>{
-
-    const div = document.createElement("div");
-
-    div.className = "historyItem";
-
-    let html = `<b>${game.date}</b><br>`;
-
-    game.players.forEach(p=>{
-
-      html += `${p.rank}位 ${p.name} (${p.score})<br>`;
+        html += `
+            <tr>
+                <td>${name}</td>
+                <td class="${data.money >=0 ? 'moneyPlus':'moneyMinus'}">
+                    ${Math.round(data.money).toLocaleString()}円
+                </td>
+            </tr>
+        `;
     });
 
-    div.innerHTML = html;
+    html += '</table>';
 
-    history.appendChild(div);
-  });
+    area.innerHTML = html;
 }
 
-renderHistory();
-toggleMode();
+function saveSettings(){
 
+    const settings = {
+        uma:document.getElementById('uma').value,
+        oka:document.getElementById('oka').value,
+        chip:document.getElementById('chip').value
+    };
+
+    localStorage.setItem('settings', JSON.stringify(settings));
+
+    alert('設定保存');
+}
+
+renderPlayers();
+renderSettlement();
+renderInputs();
 </script>
 
 </body>
 </html>
-```
-
----
-
-## ③ 保存
-
-下までスクロールして：
-
-* `Commit changes`
-
-を押してください。
-
-そのあと数十秒待つと、Vercel側が自動更新されます。
-
-スマホで再読み込みすると新機能版になります。
